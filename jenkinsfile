@@ -1,0 +1,42 @@
+pipeline {
+
+    agent any
+
+    stages {
+
+        stage('Clone') {
+            steps {
+                git branch: 'main',
+                url: ' https://github.com/ashu30augray-web/ML_PROJECT.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t ml-project .'
+            }
+        }
+
+        stage('Remove Old Container') {
+            steps {
+                sh '''
+                docker stop ml-project || true
+                docker rm ml-project || true
+                '''
+            }
+        }
+
+        stage('Run Container') {
+            steps {
+                sh '''
+                docker run -d \
+                --name ml-project \
+                -p 5000:5000 \
+                ml-project
+                '''
+            }
+        }
+
+    }
+
+}
